@@ -12,7 +12,7 @@ public class GuiSpeedometer : MonoBehaviour
     private void Update()
     {
         // if the conversion rate is 4, 1 bugs has 900 meters.
-        _speedText.text = Mathf.Ceil(_carController.CurrentSpeed * _meterPerSecToBugsPerHourConversion).ToString(CultureInfo.InvariantCulture);
+        _speedText.text = Mathf.Round(_carController.CurrentSpeed * _meterPerSecToBugsPerHourConversion).ToString(CultureInfo.InvariantCulture);
     }
     
 }

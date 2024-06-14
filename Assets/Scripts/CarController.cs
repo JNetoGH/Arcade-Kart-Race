@@ -104,6 +104,7 @@ public class CarController : MonoBehaviour
                 _horizontalInput = Input.GetAxis("Horizontal");
                 break;
             case InputMode.Controller:
+                // The forward has priority over the reverse.
                 _verticalInput = Input.GetButton("Fire2") ? 1 : 0;
                 if (_verticalInput == 0) 
                     _verticalInput = Input.GetButton("Fire1") ? -1 : 0;
