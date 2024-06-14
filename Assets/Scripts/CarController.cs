@@ -9,7 +9,6 @@ using UnityEngine;
 /// </summary>
 public class CarController : MonoBehaviour
 {
-
     
     public enum InputMode
     {
@@ -28,7 +27,7 @@ public class CarController : MonoBehaviour
     [SerializeField] private float _maxSpeed = 25f;
    
     [Header("Turning")]
-    [SerializeField, Tooltip(TipTf)] private float _turnStrength = 150;
+    [SerializeField, Tooltip(TipTf)] private float _turnStrength = 120;
     private const string TipTf = "How fast the car turns";
     
     [Header("Gravity/Ground Check")]
@@ -67,6 +66,9 @@ public class CarController : MonoBehaviour
     [ReadOnly, SerializeField] private float _verticalIncrement;
     [ReadOnly, SerializeField] private float _horizontalInput;
     [ReadOnly, SerializeField] private float _turnIncrement;
+    
+    // Communication Properties
+    public float CurrentSpeed => _currentSpeed;
     
     private void Start()
     {
