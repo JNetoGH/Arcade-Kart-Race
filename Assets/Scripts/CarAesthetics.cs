@@ -12,10 +12,17 @@ public class CarAesthetics : MonoBehaviour
     [SerializeField] private CarController _carController;
     
     [Header("Wheels Turn")]
-    [SerializeField] private Transform _leftFrontWheel;
-    [SerializeField] private Transform _rightFrontWheel;
+    [SerializeField] private Transform _wrapperFrontLeftWheel;
+    [SerializeField] private Transform _wrapperFrontRightWheel;
     [SerializeField] private float _maxWheelsTurnAngle = 40;
     [SerializeField] private float _wheelsTurnAngleChangingSpeed = 250;
+    
+    [Header("Wheels Spin")]
+    [SerializeField] private Transform _frontLeftWheel;
+    [SerializeField] private Transform _frontRightWheel;
+    [SerializeField] private Transform _backLeftWheel;
+    [SerializeField] private Transform _backRightWheel;
+    [SerializeField] private float _wheelSpinSpeed = 1500;
     
     [Header("Dust")] 
     [SerializeField] private ParticleSystem[] _dustTrail;
@@ -25,9 +32,9 @@ public class CarAesthetics : MonoBehaviour
     private void Update()
     {
         UpdateWheelsTurnRotation();
-        // UpdateWheelsSpinRotation();
+        UpdateWheelsSprinRotation();
     }
-
+    
     private void FixedUpdate()
     {
         UpdateDustEmission();
@@ -35,22 +42,42 @@ public class CarAesthetics : MonoBehaviour
     
     private void UpdateWheelsTurnRotation()
     {
+        // It's made on the Wrappers parents, because it would get all wrecked if made together with the spin.
+        
         // Uses the _horizontalInput * _maxWheelsTurn to get a new target rotation in the Y-axis for the wheel.
         // Then, goes gradually rotating the wheel in the Y axis towards the new rotation.
-        Vector3 rightWheelRot = _rightFrontWheel.localRotation.eulerAngles;
+        Vector3 rightWheelRot = _wrapperFrontRightWheel.localRotation.eulerAngles;
         Quaternion rightWheelTargetRot =  Quaternion.Euler(rightWheelRot.x, (_carController.HorizontalInput * _maxWheelsTurnAngle), rightWheelRot.z);
-        _rightFrontWheel.localRotation = Quaternion.RotateTowards(
-            _rightFrontWheel.localRotation, 
+        _wrapperFrontRightWheel.localRotation = Quaternion.RotateTowards(
+            _wrapperFrontRightWheel.localRotation, 
             rightWheelTargetRot, 
             _wheelsTurnAngleChangingSpeed * Time.deltaTime);
         
         // The left wheel is already rotated in 180 degrees, it's just flipped, so, needs to be inverted by subtracting 180. 
-        Vector3 leftWheelRot = _leftFrontWheel.localRotation.eulerAngles;
+        Vector3 leftWheelRot = _wrapperFrontLeftWheel.localRotation.eulerAngles;
         Quaternion leftWheelTargetRot = Quaternion.Euler(leftWheelRot.x, (_carController.HorizontalInput * _maxWheelsTurnAngle) - 180, leftWheelRot.z);
-        _leftFrontWheel.localRotation = Quaternion.RotateTowards(
-            _leftFrontWheel.localRotation, 
+        _wrapperFrontLeftWheel.localRotation = Quaternion.RotateTowards(
+            _wrapperFrontLeftWheel.localRotation, 
             leftWheelTargetRot, 
             _wheelsTurnAngleChangingSpeed * Time.deltaTime);
+    }
+    
+    private void UpdateWheelsSprinRotation()
+    {
+        if (_carController.VerticalInput == 0) 
+            return;
+        
+        // The left one is, rotated in Y 180 degrees.
+        _frontLeftWheel.Rotate(- _wheelSpinSpeed * Time.deltaTime, 0 ,0);
+        _frontRightWheel.Rotate(_wheelSpinSpeed * Time.deltaTime, 0 ,0);
+        
+        // Can only spin the back wheels when grounded, because the engine is at the front.
+        if (!_carController.IsGrounded)
+            return;
+            
+        // The left one is, rotated in Y 180 degrees.
+        _backLeftWheel.Rotate(- _wheelSpinSpeed * Time.deltaTime, 0 ,0);
+        _backRightWheel.Rotate(_wheelSpinSpeed * Time.deltaTime, 0 ,0);
     }
     
     private void UpdateDustEmission()
