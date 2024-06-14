@@ -9308,7 +9308,7 @@ MonoBehaviour:
   _forwardAcceleration: 8
   _reverseAcceleration: 4
   _accelerationMultiplier: 1000
-  _maxSpeed: 25
+  _maxSpeed: 30
   _turnStrength: 120
   _gravityForce: 10
   _gravityMultiplier: 100
@@ -9952,7 +9952,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 18.900024, y: 0}
+  m_AnchoredPosition: {x: 18.899902, y: 0}
   m_SizeDelta: {x: 284.0335, y: 100}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1765146496

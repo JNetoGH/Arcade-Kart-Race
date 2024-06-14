@@ -24,7 +24,7 @@ public class CarController : MonoBehaviour
     [SerializeField] private float _forwardAcceleration = 8f;
     [SerializeField] private float _reverseAcceleration = 4f;
     [SerializeField] private float _accelerationMultiplier = 1000f;
-    [SerializeField] private float _maxSpeed = 25f;
+    [SerializeField] private float _maxSpeed = 30f;
    
     [Header("Turning")]
     [SerializeField, Tooltip(TipTf)] private float _turnStrength = 120;
