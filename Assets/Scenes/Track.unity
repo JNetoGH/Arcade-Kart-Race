@@ -9342,11 +9342,6 @@ MonoBehaviour:
   _rightFrontWheel: {fileID: 1688694235}
   _maxWheelsTurnAngle: 40
   _wheelsTurnAngleChangingSpeed: 250
-  _spinWrapperFrontLeft: {fileID: 0}
-  _spinWrapperFrontRight: {fileID: 0}
-  _spinWrapperBackLeft: {fileID: 0}
-  _spinWrapperBackRight: {fileID: 0}
-  _wheelSpinSpeed: 10
   _dustTrail:
   - {fileID: 1332825475}
   - {fileID: 1924740528}
@@ -15508,7 +15503,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 2
   m_Constraints: 0
-  m_CollisionDetection: 1
+  m_CollisionDetection: 2
 --- !u!135 &1976886495
 SphereCollider:
   m_ObjectHideFlags: 0
