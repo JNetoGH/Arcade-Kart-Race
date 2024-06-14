@@ -46,6 +46,9 @@ public class CarController : MonoBehaviour
     private const string TipDwg = "How much the car stops moving when on the ground, around 3 is mostly fine";
     private const string TipDwa = "How much the car stops moving when on the air, it should be low, like 0.1, " +
                                   "if it's too high, the car will suddenly stop once it's off the ground.";
+
+    [Header("Slope")] 
+    [SerializeField] private float _angleOnSlopeChangingSpeed = 100f;
     
     [Header("Debugging")] 
     [ReadOnly, SerializeField] private float _currentSpeed;
@@ -150,12 +153,17 @@ public class CarController : MonoBehaviour
     {
         // - Rotates the car, based on what the ground ray checker hits while grounded,
         //   it enables teh car to rotate over slopes in the X axis.
-        // - This method will make the transform.Up tho be the same as the normal of the ray hit.
+        // - This method will make the transform.Up tho be the same as the normal of the surface hit.
         // - Which is the angle what whatever the physics model is hitting against.
         // - Multiplying by the current rotation, will allow it to be affected by the current Turn rotation (y-axis),
         //   otherwise the car would always override the turn rotation and look only forward.
-        if (_isGrounded)
-            transform.rotation = Quaternion.FromToRotation(transform.up, _groundRayHit.normal) * transform.rotation;
+        if (!_isGrounded)
+            return;
+        
+        // Moves gradually towards the slope, otherwise it would just teleport.
+        Quaternion targetSlopeRot = Quaternion.FromToRotation(transform.up, _groundRayHit.normal) * transform.rotation;
+        transform.rotation = Quaternion.RotateTowards(
+            transform.rotation, targetSlopeRot, _angleOnSlopeChangingSpeed * Time.deltaTime);
     }
     
     private void UpdateDrag()
