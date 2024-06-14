@@ -8933,12 +8933,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 99e36202ea71b024b957cb4f3a9c4ec7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _inputMode: 1
   _physicsModel: {fileID: 1976886494}
   _forwardAcceleration: 8
   _reverseAcceleration: 4
   _accelerationMultiplier: 1000
   _maxSpeed: 25
-  _turnStrength: 180
+  _turnStrength: 150
   _gravityForce: 10
   _gravityMultiplier: 100
   _isGrounded: 0

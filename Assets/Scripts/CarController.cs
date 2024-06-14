@@ -10,7 +10,15 @@ using UnityEngine;
 public class CarController : MonoBehaviour
 {
 
-    [Header("General References")]
+    
+    public enum InputMode
+    {
+        Keyboard,
+        Controller,
+    }
+
+    [Header("General")] 
+    [SerializeField] private InputMode _inputMode = InputMode.Controller;
     [SerializeField] private Rigidbody _physicsModel;
     
     [Header("Acceleration")]
@@ -20,7 +28,7 @@ public class CarController : MonoBehaviour
     [SerializeField] private float _maxSpeed = 25f;
    
     [Header("Turning")]
-    [SerializeField, Tooltip(TipTf)] private float _turnStrength = 180;
+    [SerializeField, Tooltip(TipTf)] private float _turnStrength = 150;
     private const string TipTf = "How fast the car turns";
     
     [Header("Gravity/Ground Check")]
@@ -87,8 +95,19 @@ public class CarController : MonoBehaviour
     
     private void UpdateInputs()
     {
-        _verticalInput = Input.GetAxis("Vertical");
-        _horizontalInput = Input.GetAxis("Horizontal");
+        switch (_inputMode)
+        {
+            case InputMode.Keyboard:
+                _verticalInput = Input.GetAxis("Vertical");
+                _horizontalInput = Input.GetAxis("Horizontal");
+                break;
+            case InputMode.Controller:
+                _verticalInput = Input.GetButton("Fire2") ? 1 : 0;
+                if (_verticalInput == 0) 
+                    _verticalInput = Input.GetButton("Fire1") ? -1 : 0;
+                _horizontalInput = Input.GetAxis("Horizontal");
+                break;
+        }
     } 
     
     private void UpdateIncrements()
