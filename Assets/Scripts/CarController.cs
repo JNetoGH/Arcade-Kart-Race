@@ -1,6 +1,7 @@
 using System;
 using NaughtyAttributes;
 using UnityEngine;
+using Range = UnityEngine.SocialPlatforms.Range;
 
 
 /// <summary>
@@ -27,8 +28,13 @@ public class CarController : MonoBehaviour
     [SerializeField] private float _maxSpeed = 30f;
    
     [Header("Turning")]
-    [SerializeField, Tooltip(TipTf)] private float _turnStrength = 120;
-    private const string TipTf = "How fast the car turns";
+    [SerializeField, Tooltip(TipTurn)] private float _turnStrengthWhenOnGround = 120;
+    [SerializeField, Tooltip(TipTurn)] private float _turnStrengthWhenInAir = 180;
+    [SerializeField, Tooltip(TipZScale), Range(0, 1)] private float _turnZAxisScale = 0.5f;
+    private const string TipTurn = "How fast the car turns.";
+    private const string TipZScale = "The amount of rotation in the Z axis." +
+                                     "This Z axis modifier can vary from 0 to 1, 0 being nothing and 1 the same " +
+                                     "amount in the Z axis as Y axis.";
     
     [Header("Gravity/Ground Check")]
     [SerializeField, Tooltip(TipGf)] private float _gravityForce = 10;
@@ -37,12 +43,12 @@ public class CarController : MonoBehaviour
     [SerializeField] private float _groundCheckerRayLength = 0.5f;
     [SerializeField] private Transform _groundCheckerRayStartPoint;
     [SerializeField] private LayerMask _groundLayers;
-    private const string TipGf = "Applied only when the rigid body is off the ground";
+    private const string TipGf = "Applied only when the rigid body is off the ground.";
     private RaycastHit _groundRayHit;
     
     [Header("Drag")]
     [SerializeField, Tooltip(TipDwg)] private float _dragWhenOnGround = 3;
-    [SerializeField, Tooltip(TipDwa)] private float _dragWhenOnAir = 0.1f;
+    [SerializeField, Tooltip(TipDwa)] private float _dragWhenInAir = 0.1f;
     private const string TipDwg = "How much the car stops moving when on the ground, around 3 is mostly fine";
     private const string TipDwa = "How much the car stops moving when on the air, it should be low, like 0.1, " +
                                   "if it's too high, the car will suddenly stop once it's off the ground.";
@@ -53,8 +59,11 @@ public class CarController : MonoBehaviour
     [Header("Jumping")] 
     [SerializeField] private float _jumpForce = 35f;
     [SerializeField] private float _jumpMultiplier = 1000;
-    [SerializeField, Range(0, 1)] private float _jumpForwardness = 0.5f;
-    [ReadOnly, SerializeField] private bool _jumpInputBuffer = false;
+    [SerializeField, Range(0, 1), Tooltip(TipFrd)] private float _jumpForwardness = 0.5f;
+    private bool _jumpInputBuffer = false;
+    private const string TipFrd = "The amount of force applied forward." +
+                                  "The jump direction can have some amount of forwardness in it, varying from 0 to 1, " +
+                                  "0 being nothing and 1 the same amount of forwards as upwards.";
     
     [Header("Debugging")] 
     [ReadOnly, SerializeField] private float _currentSpeed;
@@ -74,6 +83,7 @@ public class CarController : MonoBehaviour
     {
         UpdateInputs();
         UpdateIncrements();
+        TryJump();
         UpdateTurnRotation();
         UpdateCarPosition();
     }
@@ -84,8 +94,7 @@ public class CarController : MonoBehaviour
         UpdateIsGrounded();
         UpdateSlope();
         UpdateDrag();
-        UpdatePhysicsModel();
-        TryJump();
+        UpdatePhysicsModelMotion();
     }
 
     private void UpdateInputs()
@@ -112,13 +121,18 @@ public class CarController : MonoBehaviour
     
     private void UpdateIncrements()
     {
-        // Clears the forward/backward increment and then, updates it.
+        // Clears the forward/backward increment and then, updates it: (direction * acceleration * multiplier).
         _verticalIncrement = 0;
-        if (_verticalInput > 0) _verticalIncrement = _verticalInput * _forwardAcceleration * _accelerationMultiplier;
-        else if (_verticalInput < 0) _verticalIncrement = _verticalInput * _reverseAcceleration * _accelerationMultiplier;
+        bool goingForward = _verticalInput > 0;
+        bool goingBackward = _verticalInput > 0;
+        if (goingForward) _verticalIncrement = _verticalInput * _forwardAcceleration * _accelerationMultiplier;
+        else if (goingBackward) _verticalIncrement = _verticalInput * _reverseAcceleration * _accelerationMultiplier;
         
-        // Updates the turning by adding on the amount of turning to be done.
-        _turnIncrement = _horizontalInput * _turnStrength * Time.deltaTime;
+        // Updates the turning increment by adding on the amount of turning to be done:
+        // (direction * strength * △T)
+        _turnIncrement = 0;
+        float turnStrength = (_isGrounded ? _turnStrengthWhenOnGround : _turnStrengthWhenInAir);
+        _turnIncrement = _horizontalInput * turnStrength * Time.deltaTime;
         
         // When grounded (not in the air, for air controlling):
         // - The car should not turn when stopped, only when moving, to do so, the _turnIncrement is multiplied by the
@@ -135,8 +149,12 @@ public class CarController : MonoBehaviour
     
     private void UpdateTurnRotation()
     {
-        // Updates the turning by adding on the amount of turning to be done.
-        transform.rotation = Quaternion.Euler(transform.rotation.eulerAngles + new Vector3(0, _turnIncrement, 0));
+        // Updates the turning by adding on the amount of turning to be done, varying from grounded to in air.
+        if (_isGrounded)
+            transform.rotation = Quaternion.Euler(transform.rotation.eulerAngles + new Vector3(0, _turnIncrement, 0));
+        else
+            // Turn increment in the Z axis needs to be negative.
+            transform.rotation = Quaternion.Euler(transform.rotation.eulerAngles + new Vector3(0, _turnIncrement, -_turnIncrement * _turnZAxisScale));
     }
     
     private void UpdateMaxVelocity()
@@ -151,7 +169,7 @@ public class CarController : MonoBehaviour
         // Clears the previously cached value.
         _isGrounded = false;
         // it needs to be in a direction relative to the car, and there is no transform.down, that's why the - transform.up.
-        if (Physics.Raycast(_groundCheckerRayStartPoint.position, - transform.up , out _groundRayHit, _groundCheckerRayLength, _groundLayers))
+        if (Physics.Raycast(_groundCheckerRayStartPoint.position, -transform.up , out _groundRayHit, _groundCheckerRayLength, _groundLayers))
             _isGrounded = true;
     }
     
@@ -174,10 +192,10 @@ public class CarController : MonoBehaviour
     
     private void UpdateDrag()
     {
-        _physicsModel.drag = _isGrounded ? _dragWhenOnGround : _dragWhenOnAir;
+        _physicsModel.drag = _isGrounded ? _dragWhenOnGround : _dragWhenInAir;
     }
 
-    private void UpdatePhysicsModel()
+    private void UpdatePhysicsModelMotion()
     {
         // THe car can only move when grounded, otherwise it will have some extra gravity applied.
         if (_isGrounded)
@@ -196,21 +214,22 @@ public class CarController : MonoBehaviour
         _currentSpeed = _physicsModel.velocity.magnitude;
     }
     
-    
     private void TryJump()
     {
-        if (!_jumpInputBuffer)
-            return;
+        if (_jumpInputBuffer) _jumpInputBuffer = false;
+        else return;
         
-        // Blocks the player from jumping twice.
-        bool isGoingUp = _physicsModel.velocity.y > 0;
+        // Blocks the player from jumping twice,
+        // by allowing jump only when not jumping already (velocity.y not going up).
+        // The 0.2 instead of 0 is to avoid mistakes from possible noises in the rigidbody.
+        bool isGoingUp = _physicsModel.velocity.y > 0.2;
         if (isGoingUp)
             return;
         
-        Debug.Log("Payer Jumped");
+        Debug.Log($"Payer Jumped: velocity.y ({_physicsModel.velocity.y})");
         Vector3 jumpDirection = transform.up + (transform.forward * _jumpForwardness);
         _physicsModel.AddForce(jumpDirection * (_jumpForce * _jumpMultiplier));
-        _jumpInputBuffer = false;
+    
     }
     
     private void OnDrawGizmos()
