@@ -112,7 +112,7 @@ public class CarController : MonoBehaviour
     
     private void UpdateIncrements()
     {
-        // Clears the forward/backwards increment and then, updates it.
+        // Clears the forward/backward increment and then, updates it.
         _verticalIncrement = 0;
         if (_verticalInput > 0) _verticalIncrement = _verticalInput * _forwardAcceleration * _accelerationMultiplier;
         else if (_verticalInput < 0) _verticalIncrement = _verticalInput * _reverseAcceleration * _accelerationMultiplier;
@@ -123,7 +123,7 @@ public class CarController : MonoBehaviour
         // When grounded (not in the air, for air controlling):
         // - The car should not turn when stopped, only when moving, to do so, the _turnIncrement is multiplied by the
         //   _verticalInput, when the car is stopped, this value is 0, and therefore the turn increment will be zero.
-        // - When moving backwards the rotation keys/axis will be inverted, just like in a real car.
+        // - When moving backward the rotation keys/axis will be inverted, just like in a real car.
         if (_isGrounded)
             _turnIncrement *= _verticalInput;
     } 
