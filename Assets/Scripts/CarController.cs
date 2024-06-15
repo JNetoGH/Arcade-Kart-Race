@@ -50,6 +50,12 @@ public class CarController : MonoBehaviour
     [Header("Slope")] 
     [SerializeField] private float _angleOnSlopeChangingSpeed = 100f;
     
+    [Header("Jumping")] 
+    [SerializeField] private float _jumpForce = 35f;
+    [SerializeField] private float _jumpMultiplier = 1000;
+    [SerializeField, Range(0, 1)] private float _jumpForwardness = 0.5f;
+    [ReadOnly, SerializeField] private bool _jumpInputBuffer = false;
+    
     [Header("Debugging")] 
     [ReadOnly, SerializeField] private float _currentSpeed;
     [ReadOnly, SerializeField] private float _verticalInput;
@@ -63,7 +69,7 @@ public class CarController : MonoBehaviour
     public float VerticalInput => _verticalInput;
     public float HorizontalInput => _horizontalInput;
     public InputMode InputModeProp { get => _inputMode; set => _inputMode = value; }
-
+    
     private void Update()
     {
         UpdateInputs();
@@ -79,8 +85,9 @@ public class CarController : MonoBehaviour
         UpdateSlope();
         UpdateDrag();
         UpdatePhysicsModel();
+        TryJump();
     }
-    
+
     private void UpdateInputs()
     {
         switch (_inputMode)
@@ -88,6 +95,8 @@ public class CarController : MonoBehaviour
             case InputMode.Keyboard:
                 _verticalInput = Input.GetAxis("Vertical");
                 _horizontalInput = Input.GetAxis("Horizontal");
+                if (_isGrounded && Input.GetButtonDown("Jump"))
+                    _jumpInputBuffer = true;
                 break;
             case InputMode.Controller:
                 // The forward has priority over the reverse.
@@ -95,6 +104,8 @@ public class CarController : MonoBehaviour
                 if (_verticalInput == 0) 
                     _verticalInput = Input.GetButton("Fire1") ? -1 : 0;
                 _horizontalInput = Input.GetAxis("Horizontal");
+                if (_isGrounded && Input.GetButtonDown("Jump"))
+                    _jumpInputBuffer = true;
                 break;
         }
     } 
@@ -108,10 +119,13 @@ public class CarController : MonoBehaviour
         
         // Updates the turning by adding on the amount of turning to be done.
         _turnIncrement = _horizontalInput * _turnStrength * Time.deltaTime;
-        // The car should not turn when stopped, only when moving, to do so, the _turnIncrement is multiplied
-        // by the _verticalInput, when the car is stopped, this value is 0, and therefore the turn increment will be zero.
-        // When moving backwards the rotation keys/axis will be inverted, just like in a real car.
-        _turnIncrement *= _verticalInput;
+        
+        // When grounded (not in the air, for air controlling):
+        // - The car should not turn when stopped, only when moving, to do so, the _turnIncrement is multiplied by the
+        //   _verticalInput, when the car is stopped, this value is 0, and therefore the turn increment will be zero.
+        // - When moving backwards the rotation keys/axis will be inverted, just like in a real car.
+        if (_isGrounded)
+            _turnIncrement *= _verticalInput;
     } 
     
     private void UpdateCarPosition()
@@ -121,10 +135,6 @@ public class CarController : MonoBehaviour
     
     private void UpdateTurnRotation()
     {
-        // Can only Rotate when grounded.
-        if (!_isGrounded)
-            return;
-        
         // Updates the turning by adding on the amount of turning to be done.
         transform.rotation = Quaternion.Euler(transform.rotation.eulerAngles + new Vector3(0, _turnIncrement, 0));
     }
@@ -138,6 +148,7 @@ public class CarController : MonoBehaviour
     
     private void UpdateIsGrounded()
     {
+        // Clears the previously cached value.
         _isGrounded = false;
         // it needs to be in a direction relative to the car, and there is no transform.down, that's why the - transform.up.
         if (Physics.Raycast(_groundCheckerRayStartPoint.position, - transform.up , out _groundRayHit, _groundCheckerRayLength, _groundLayers))
@@ -180,8 +191,26 @@ public class CarController : MonoBehaviour
             // Applies some extra gravity when not grounded.
             _physicsModel.AddForce(Vector3.down * _gravityForce * _gravityMultiplier);
         }
+        
         // It's not used for nothing in the motion, but it's sent to stuff like GUI.
         _currentSpeed = _physicsModel.velocity.magnitude;
+    }
+    
+    
+    private void TryJump()
+    {
+        if (!_jumpInputBuffer)
+            return;
+        
+        // Blocks the player from jumping twice.
+        bool isGoingUp = _physicsModel.velocity.y > 0;
+        if (isGoingUp)
+            return;
+        
+        Debug.Log("Payer Jumped");
+        Vector3 jumpDirection = transform.up + (transform.forward * _jumpForwardness);
+        _physicsModel.AddForce(jumpDirection * (_jumpForce * _jumpMultiplier));
+        _jumpInputBuffer = false;
     }
     
     private void OnDrawGizmos()
