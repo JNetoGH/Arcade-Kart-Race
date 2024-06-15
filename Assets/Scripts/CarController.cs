@@ -12,8 +12,8 @@ public class CarController : MonoBehaviour
     
     public enum InputMode
     {
-        Keyboard,
         Controller,
+        Keyboard,
     }
 
     [Header("General")] 
@@ -62,13 +62,8 @@ public class CarController : MonoBehaviour
     public bool IsGrounded => _isGrounded;
     public float VerticalInput => _verticalInput;
     public float HorizontalInput => _horizontalInput;
+    public InputMode InputModeProp { get => _inputMode; set => _inputMode = value; }
 
-    private void Start()
-    {
-        // Deparents the physics model so the car movement post doesn't move it.
-        _physicsModel.transform.parent = null;
-    }
-    
     private void Update()
     {
         UpdateInputs();
@@ -188,5 +183,7 @@ public class CarController : MonoBehaviour
         // It's not used for nothing in the motion, but it's sent to stuff like GUI.
         _currentSpeed = _physicsModel.velocity.magnitude;
     }
+    
+    
     
 }
