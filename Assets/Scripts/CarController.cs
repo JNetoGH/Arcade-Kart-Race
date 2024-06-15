@@ -184,6 +184,21 @@ public class CarController : MonoBehaviour
         _currentSpeed = _physicsModel.velocity.magnitude;
     }
     
+    private void OnDrawGizmos()
+    {
+        DrawGroundCheckerRayOnGizmos();
+    }
     
+    private void DrawGroundCheckerRayOnGizmos() 
+    {
+        if (_groundCheckerRayStartPoint == null) 
+            return;
+        
+        Vector3 rayDirection = -transform.up * _groundCheckerRayLength;
+        // Set gizmo color based on grounded state
+        Gizmos.color = _isGrounded ? Color.green : Color.red;
+        Gizmos.DrawLine(_groundCheckerRayStartPoint.position, _groundCheckerRayStartPoint.position + rayDirection);
+        Gizmos.DrawSphere(_groundCheckerRayStartPoint.position + rayDirection, 0.1f);
+    }
     
 }
