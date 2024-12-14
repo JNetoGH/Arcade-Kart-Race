@@ -31,10 +31,12 @@ public class CarController : MonoBehaviour
     [SerializeField, Tooltip(TipTurn)] private float _turnStrengthWhenOnGround = 120;
     [SerializeField, Tooltip(TipTurn)] private float _turnStrengthWhenInAir = 180;
     [SerializeField, Tooltip(TipZScale), Range(0, 1)] private float _turnZAxisScale = 0.5f;
+    [SerializeField, Tooltip(TipAirTurnPer), Range(0, 100)] float _airTurnPercentage = 70f;
     private const string TipTurn = "How fast the car turns.";
     private const string TipZScale = "The amount of rotation in the Z axis." +
                                      "This Z axis modifier can vary from 0 to 1, 0 being nothing and 1 the same " +
                                      "amount in the Z axis as Y axis.";
+    private const string TipAirTurnPer = "How much of the gorunded turn the air turn will be.";
     
     [Header("Gravity/Ground Check")]
     [SerializeField, Tooltip(TipGf)] private float _gravityForce = 10;
@@ -146,15 +148,26 @@ public class CarController : MonoBehaviour
     {
 	    transform.position = _physicsModel.transform.position;
     }
-    
+
+  
     private void UpdateTurnRotation()
     {
         // Updates the turning by adding on the amount of turning to be done, varying from grounded to in air.
         if (_isGrounded)
+        {
             transform.rotation = Quaternion.Euler(transform.rotation.eulerAngles + new Vector3(0, _turnIncrement, 0));
+        }
         else
+        {
+            float airTurnIncrement = _turnIncrement / 100 * _airTurnPercentage;
+            
             // Turn increment in the Z axis needs to be negative.
-            transform.rotation = Quaternion.Euler(transform.rotation.eulerAngles + new Vector3(0, _turnIncrement, -_turnIncrement * _turnZAxisScale));
+            transform.rotation = Quaternion.Euler(transform.rotation.eulerAngles +
+                                                  new Vector3(
+                                                      0,
+                                                      airTurnIncrement, 
+                                                      - airTurnIncrement * _turnZAxisScale));
+        }
     }
     
     private void UpdateMaxVelocity()

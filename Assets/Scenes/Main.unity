@@ -2151,6 +2151,16 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5817552851317505731, guid: 0dd90c65c24847048adbaaa592bf84c6,
         type: 3}
+      propertyPath: _airTurnMaxSpeed
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5817552851317505731, guid: 0dd90c65c24847048adbaaa592bf84c6,
+        type: 3}
+      propertyPath: _residualAirTurn
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5817552851317505731, guid: 0dd90c65c24847048adbaaa592bf84c6,
+        type: 3}
       propertyPath: _groundLayers.m_Bits
       value: 256
       objectReference: {fileID: 0}
