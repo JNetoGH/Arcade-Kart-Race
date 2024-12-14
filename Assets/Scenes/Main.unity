@@ -1632,6 +1632,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2785901610037626484, guid: c830fbdf1bd35d04fb9f19f1d8589aff,
+        type: 3}
+      propertyPath: m_Value
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7603579363239236875, guid: c830fbdf1bd35d04fb9f19f1d8589aff,
         type: 3}
       propertyPath: _carController
@@ -1975,7 +1980,7 @@ Transform:
   m_GameObject: {fileID: 5830062683895907009}
   serializedVersion: 2
   m_LocalRotation: {x: 0.27544895, y: -0.000000005723422, z: 0.0000000016399511, w: 0.9613157}
-  m_LocalPosition: {x: 3.85, y: 2.9099998, z: 17.179998}
+  m_LocalPosition: {x: 3.85, y: 2.79, z: 17.179998}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1991,7 +1996,7 @@ Transform:
   m_GameObject: {fileID: 583174331824921197}
   serializedVersion: 2
   m_LocalRotation: {x: 0.27544895, y: -0.000000005723422, z: 0.0000000016399511, w: 0.9613157}
-  m_LocalPosition: {x: 3.85, y: 2.9099998, z: 17.179998}
+  m_LocalPosition: {x: 3.85, y: 2.79, z: 17.179998}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2071,6 +2076,21 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1877124242483285469, guid: 0dd90c65c24847048adbaaa592bf84c6,
         type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 1877124242483285469, guid: 0dd90c65c24847048adbaaa592bf84c6,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 1877124242483285469, guid: 0dd90c65c24847048adbaaa592bf84c6,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 1877124242483285469, guid: 0dd90c65c24847048adbaaa592bf84c6,
+        type: 3}
       propertyPath: m_LocalPosition.x
       value: 3.85
       objectReference: {fileID: 0}
@@ -2118,6 +2138,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1877124242483285469, guid: 0dd90c65c24847048adbaaa592bf84c6,
+        type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1975677913591379028, guid: 0dd90c65c24847048adbaaa592bf84c6,
         type: 3}
